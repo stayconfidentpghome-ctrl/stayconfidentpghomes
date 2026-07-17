@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// Firestore rules for the "stayconfidentpghomes-e3344" project used by this site.
+//
+// The site has no server and no login system — the Admin tab is protected only by a
+// PIN check inside the browser's JavaScript, which a technical visitor could bypass by
+// calling Firestore directly. These rules keep things reasonable for a small PG-listing
+// site without a backend:
+//   - Anyone can READ, so the room-availability page works for every visitor (this data
+//     is not sensitive — it's the same thing shown publicly on the site).
+//   - Anyone can WRITE to this collection, because there is no server-side way to verify
+//     "this request came from the Admin tab with the correct PIN" — Firestore rules can't
+//     see your PIN. This is the trade-off of a client-only PIN gate.
+//
+// If you want real write protection later, the fix is to add Firebase Authentication
+// (e.g. a single admin email/password) and change the write rule below to
+// `allow write: if request.auth != null;` — ask and this can be wired in.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /scpg/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
